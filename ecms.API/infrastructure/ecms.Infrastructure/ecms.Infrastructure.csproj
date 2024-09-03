@@ -16,4 +16,9 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\core\ecms.Application\ecms.Application.csproj" />
+    <ProjectReference Include="..\..\core\ecms.Domain\ecms.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

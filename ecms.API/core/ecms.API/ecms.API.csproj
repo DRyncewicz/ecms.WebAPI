@@ -19,7 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Extensions\" />
+    <ProjectReference Include="..\..\infrastructure\ecms.Infrastructure\ecms.Infrastructure.csproj" />
+    <ProjectReference Include="..\ecms.Application\ecms.Application.csproj" />
   </ItemGroup>
 
 </Project>
