@@ -1,5 +1,6 @@
 ﻿using Azure.Storage.Blobs;
-using ecms.Application.Storage;
+using ecms.Application.Abstractions.Data;
+using ecms.Application.Abstractions.Storage;
 using ecms.Infrastructure.Database;
 using ecms.Infrastructure.Storage;
 using ecms.Infrastructure.Time;
@@ -29,6 +30,7 @@ public static class DependencyInjection
         Ensure.NotNullOrEmpty(connectionString);
 
         services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+        services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
     }
 
     private static void AddStorage(IServiceCollection services, IConfiguration configuration)

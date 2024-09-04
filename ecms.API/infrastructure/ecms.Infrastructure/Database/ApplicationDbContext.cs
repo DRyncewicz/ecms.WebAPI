@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ecms.Application.Abstractions.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using System.Data;
 
 namespace ecms.Infrastructure.Database;
 
-public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options), IApplicationDbContext
 {
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -13,8 +14,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
     }
 
-    public async Task<IDbTransaction> BeginTransactionAsync()
+    public async Task<IDbTransaction> BeginTransactionAsync(CancellationToken ct)
     {
-        return (await Database.BeginTransactionAsync()).GetDbTransaction();
+        return (await Database.BeginTransactionAsync(ct)).GetDbTransaction();
     }
 }

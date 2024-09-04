@@ -1,7 +1,7 @@
 ﻿using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using ecms.Application.Storage;
+using ecms.Application.Abstractions.Storage;
 
 namespace ecms.Infrastructure.Storage;
 

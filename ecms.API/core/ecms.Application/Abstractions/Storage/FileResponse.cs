@@ -1,3 +1,3 @@
-﻿namespace ecms.Application.Storage;
+﻿namespace ecms.Application.Abstractions.Storage;
 
 public record FileResponse(Stream Stream, string ContentType);

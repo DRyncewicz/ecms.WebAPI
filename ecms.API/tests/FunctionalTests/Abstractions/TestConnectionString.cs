@@ -1,4 +1,4 @@
-﻿namespace IntegrationTests;
+﻿namespace FunctionalTests.Abstractions;
 
 internal static class TestConnectionString
 {

@@ -1,4 +1,4 @@
-﻿namespace ecms.Application.Storage;
+﻿namespace ecms.Application.Abstractions.Storage;
 
 public interface IBlobService
 {
