@@ -16,6 +16,15 @@ public class FunctionalTestWebAppFactory : WebApplicationFactory<Program>
 
         builder.ConfigureServices(services =>
         {
+            services.Configure<TestAuthHandlerOptions>(options => options.DefaultUserId = "1");
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = TestAuthHandler.AuthenticationScheme;
+                options.DefaultScheme = TestAuthHandler.AuthenticationScheme;
+                options.DefaultChallengeScheme = TestAuthHandler.AuthenticationScheme;
+            }).AddScheme<TestAuthHandlerOptions, TestAuthHandler>(TestAuthHandler.AuthenticationScheme, options => { });
+
             var sp = services.BuildServiceProvider();
             using (var scope = sp.CreateScope())
             {
@@ -23,8 +32,6 @@ public class FunctionalTestWebAppFactory : WebApplicationFactory<Program>
                 var db = scopedServices.GetRequiredService<ApplicationDbContext>();
                 db.Database.EnsureDeleted();
             }
-            services.AddAuthentication(TestAuthHandler.AuthenticationScheme)
-                .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.AuthenticationScheme, options => { });
         });
     }
 
@@ -38,34 +45,49 @@ public class FunctionalTestWebAppFactory : WebApplicationFactory<Program>
         return client;
     }
 
-    public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+    public class TestAuthHandlerOptions : AuthenticationSchemeOptions
     {
-        public const string AuthenticationScheme = "TestScheme";
+        public string DefaultUserId { get; set; } = null!;
+    }
+
+    public class TestAuthHandler : AuthenticationHandler<TestAuthHandlerOptions>
+    {
+        public const string UserId = "UserId";
+
+        public const string AuthenticationScheme = "Test";
+        private readonly string _defaultUserId;
 
         public TestAuthHandler(
-            IOptionsMonitor<AuthenticationSchemeOptions> options,
+            IOptionsMonitor<TestAuthHandlerOptions> options,
             ILoggerFactory logger,
             UrlEncoder encoder,
             ISystemClock clock) : base(options, logger, encoder, clock)
         {
+            _defaultUserId = options.CurrentValue.DefaultUserId;
         }
 
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            if (!Request.Headers.ContainsKey("Authorization"))
-                return Task.FromResult(AuthenticateResult.Fail("Unauthorized"));
+            var claims = new List<Claim> { new Claim(ClaimTypes.Name, "Test user") };
 
-            var claims = new[]
+            // Extract User ID from the request headers if it exists,
+            // otherwise use the default User ID from the options.
+            if (Context.Request.Headers.TryGetValue(UserId, out var userId))
             {
-                new Claim(ClaimTypes.Name, "TestUser"),
-                new Claim(ClaimTypes.NameIdentifier, "1"),
-                new Claim("scope", "api1")
-            };
+                claims.Add(new Claim(ClaimTypes.NameIdentifier, userId[0]));
+            }
+            else
+            {
+                claims.Add(new Claim(ClaimTypes.NameIdentifier, _defaultUserId));
+            }
+
             var identity = new ClaimsIdentity(claims, AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
             var ticket = new AuthenticationTicket(principal, AuthenticationScheme);
 
-            return Task.FromResult(AuthenticateResult.Success(ticket));
+            var result = AuthenticateResult.Success(ticket);
+
+            return Task.FromResult(result);
         }
     }
 }

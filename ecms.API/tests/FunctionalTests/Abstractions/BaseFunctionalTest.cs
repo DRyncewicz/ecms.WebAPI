@@ -14,12 +14,15 @@ public class BaseFunctionalTest : IClassFixture<FunctionalTestWebAppFactory>, ID
         _scope = factory.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
         ApplicationDbContext = _scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         HttpClient = factory.GetClient(false);
+        AuthorizedHttpClient = factory.GetClient(true);
         CreateDb();
     }
 
     protected ApplicationDbContext ApplicationDbContext { get; }
 
     protected HttpClient HttpClient { get; }
+
+    protected HttpClient AuthorizedHttpClient { get; }
 
     private void CreateDb()
     {
