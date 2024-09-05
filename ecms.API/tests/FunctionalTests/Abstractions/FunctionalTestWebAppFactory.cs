@@ -6,6 +6,8 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 
+namespace FunctionalTests.Abstractions;
+
 public class FunctionalTestWebAppFactory : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
