@@ -15,7 +15,7 @@ public class WeatherForecastTests : BaseFunctionalTest
         //Arrange
 
         //Act
-        var response = await HttpClient.GetFromJsonAsync<IEnumerable<ecms.API.WeatherForecast>>("api/v1/WeatherForecast");
+        var response = await AuthorizedHttpClient.GetFromJsonAsync<IEnumerable<ecms.API.WeatherForecast>>("api/v1/WeatherForecast");
 
         //Assert
         response.Should().BeOfType<List<ecms.API.WeatherForecast>>();
