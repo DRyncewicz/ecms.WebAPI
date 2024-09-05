@@ -1,6 +1,8 @@
 ﻿using Azure.Storage.Blobs;
+using ecms.Application.Abstractions.Auth;
 using ecms.Application.Abstractions.Data;
 using ecms.Application.Abstractions.Storage;
+using ecms.Infrastructure.Authorization;
 using ecms.Infrastructure.Database;
 using ecms.Infrastructure.Storage;
 using ecms.Infrastructure.Time;
@@ -20,7 +22,8 @@ public static class DependencyInjection
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         AddDatabase(services, configuration);
         AddStorage(services, configuration);
-
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
         return services;
     }
 

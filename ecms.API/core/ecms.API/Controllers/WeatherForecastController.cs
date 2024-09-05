@@ -2,6 +2,7 @@ using Asp.Versioning;
 using ecms.API.Controllers.Base;
 using ecms.API.Extensions;
 using ecms.API.Infrastructure;
+using ecms.Application.Abstractions.Auth;
 using Microsoft.AspNetCore.Mvc;
 using SharedKernel;
 
@@ -16,15 +17,18 @@ public class WeatherForecastController : BaseController
     };
 
     private readonly ILogger<WeatherForecastController> _logger;
+    private readonly ICurrentUserService currentUser;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger)
+    public WeatherForecastController(ILogger<WeatherForecastController> logger, ICurrentUserService currentUser)
     {
         _logger = logger;
+        this.currentUser = currentUser;
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
     public IActionResult Get()
     {
+        var user = currentUser.UserId;
         var forecasts = Enumerable.Range(1, 5).Select(index => new WeatherForecast
         {
             Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
