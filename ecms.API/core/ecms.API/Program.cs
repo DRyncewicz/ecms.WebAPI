@@ -1,8 +1,10 @@
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using ecms.API.Infrastructure;
+using ecms.API.OpenApi;
 using ecms.Application;
 using ecms.Infrastructure;
+using ecms.Infrastructure.Authorization;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +15,7 @@ var configuration = builder.Configuration;
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGenWithAuth();
 
 builder.Host.UseSerilog((context, loggerConfig) =>
     loggerConfig.ReadFrom.Configuration(context.Configuration));
@@ -30,7 +32,7 @@ builder.Services.AddApiVersioning(options =>
 
 builder.Services.AddApplication()
     .AddInfrastructure(configuration);
-
+builder.Services.AddAuthBearer();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 var app = builder.Build();
@@ -55,8 +57,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
